@@ -3,5 +3,6 @@
 ## HW list
 - python exam
 - Algorithm
-- Search pac-man
+- Search in Pac-Man
 - LunarLander
+
