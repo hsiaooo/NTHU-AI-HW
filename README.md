@@ -2,6 +2,6 @@
 
 ## HW list
 - python exam
-- algorithm
-- search pac-man
-- lunarlander
+- Algorithm
+- Search pac-man
+- LunarLander
