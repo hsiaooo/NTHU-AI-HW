@@ -46,7 +46,7 @@ pip install box2d
 pip install pyglet
 ```
 
-**Mac O**S
+**Mac OS**
 ```
 pip3 install gym[all]
 pip3 install box2d
@@ -56,5 +56,6 @@ pip3 install box2d
 Reference: [LunarLand GA](https://sites.google.com/gapp.nthu.edu.tw/lunarlander-ga)
 
 
-<font size=1> This site is composed by Heng-An Chen, Yi-Reui Chen, Yu-Wei Wen . Last update 2020.11.04 </font>
+<font size=1> This site is composed by Heng-An Chen, Yi-Reui Chen, Yu-Wei Wen . Last update 2020.11.04 </font><br>
+
 <font size=1> Computational Intelligence Lab (CI Lab), Dept. of PME, NTHU, Taiwan. </font>
