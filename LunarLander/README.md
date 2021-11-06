@@ -1,6 +1,7 @@
 # LunarLander
 ---
 ![](img/original.gif)
+
 image credit by [Gym (openai.com)](https://gym.openai.com/envs/LunarLanderContinuous-v2/)
 
 ## You will learn to solve problem using genetic algorithm (GA).
