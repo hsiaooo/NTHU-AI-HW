@@ -16,7 +16,7 @@ In this assignment, you are asked to optimize the control policy of the lunar la
 
 &emsp;&emsp; For every time stamp, the lunar lander receives an observation vector which contains the following dimensions:
 
-&emsp;&emsp; * x position 
+&emsp;&emsp; *x position 
 
 &emsp;&emsp; * y position
 
