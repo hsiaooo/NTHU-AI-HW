@@ -12,14 +12,22 @@ A safety landing on the landing pad gets a positive reward. A safety landing out
 ### Problem Description
 In this assignment, you are asked to optimize the control policy of the lunar lander with genetic algorithm (GA). The lunar lander continuously observes its status and the environment and pilots itself according to the control policy you provided. We have implemented a GA and testing framework for you. Your task is to design and implement the evolutionary operators and tune the parameters for GA so that GA works effectively and efficiently.
 
-- ** observes ** 
+** - observes **
+
 &emsp;&emsp; For every time stamp, the lunar lander receives an observation vector which contains the following dimensions:
+
 &emsp;&emsp; * x position 
+
 &emsp;&emsp; * y position
+
 &emsp;&emsp; * x velocity 
+
 &emsp;&emsp; * y velocity
+
 &emsp;&emsp; * tilt angle
+
 &emsp;&emsp; * angular velocity
+
 &emsp;&emsp; * whether the right leg attaches to the ground (unused)
 
 
