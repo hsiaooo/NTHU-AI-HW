@@ -1,8 +1,8 @@
 # LunarLander
 ---
-<center>![](img/original.gif)</center>
+<center> ![](img/original.gif)</center>
 
-<center>image credit by [Gym (openai.com)](https://gym.openai.com/envs/LunarLanderContinuous-v2/)</center>
+<center> image credit by [Gym (openai.com)](https://gym.openai.com/envs/LunarLanderContinuous-v2/)</center>
 
 ## You will learn to solve problem using genetic algorithm (GA).
 LunarLander is a game in Open AI Gym. In this game, the task is to navigate the lander to the landing pad. By precisely controlling the lander's main engine and side engines, which produce the vertical and horizontal thrust, the lander can land on pad safely.
@@ -53,5 +53,5 @@ pip3 install box2d
 Reference: [LunarLand GA](https://sites.google.com/gapp.nthu.edu.tw/lunarlander-ga)
 
 
-<size=1> This site is composed by Heng-An Chen, Yi-Reui Chen, Yu-Wei Wen . Last update 2020.11.04 </font>
-<size=1> Computational Intelligence Lab (CI Lab), Dept. of PME, NTHU, Taiwan. </font>
+<font size=1> This site is composed by Heng-An Chen, Yi-Reui Chen, Yu-Wei Wen . Last update 2020.11.04 </font>
+<font size=1> Computational Intelligence Lab (CI Lab), Dept. of PME, NTHU, Taiwan. </font>
