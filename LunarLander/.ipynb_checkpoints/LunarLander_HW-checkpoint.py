@@ -2,12 +2,7 @@ import gym
 import random
 import math
 import pickle
-import numpy as np
-from itertools import repeat
-from operator import attrgetter, itemgetter
-import matplotlib.pyplot as plt
 from statistics import mean, median
-from collections.abc import Sequence
 
 """
 #### System Requirement ####
@@ -53,12 +48,11 @@ If you occur an ImportError like "ImportError: Can't find framework /System/Libr
 [YOUR JOB]
 Try and find a proper parameter setting.
 """
-GA_POPULATION_SIZE = 100
-GA_GENERATION = 200
-GA_K_TOURNAMENT = 20
-GA_CROSSOVER_RATE = 0.5
+GA_POPULATION_SIZE = 50
+GA_GENERATION = 20
+GA_K_TOURNAMENT = 2
+GA_CROSSOVER_RATE = 0.9
 GA_MUTATION_RATE = 0.001
-GA_BLEND_CROSSOVER_ALPHA = 0.5
 
 #### Evaluation Parameter ####
 """
@@ -67,7 +61,7 @@ Since the simulation environment is randomly generated, the simulation should be
 Notice: You may lower this parameter to make the whole GA run faster in order to get the sense of how different parameters affect the performance,
 but it is suggested that you set it to 20 to get a reliable output for homework assignment
 """
-SIMULATIONS_PER_EVALUATION = 20
+SIMULATIONS_PER_EVALUATION = 15
 
 #### [DON'T CHANGE] Evironment Parameters ####
 OBSV_DIM = 6
@@ -97,69 +91,25 @@ class Chromosome:
         dim = len(parent1.gene)
         child1, child2 = Chromosome(dim), Chromosome(dim)
 
-        for i in range(dim):
-            if random.random() < xover_rate:
-                child1.gene[i] = parent2.gene[i]
-                child2.gene[i] = parent1.gene[i]
-            else:
-                child1.gene[i] = parent1.gene[i]
-                child2.gene[i] = parent2.gene[i]
+        # uniform crossover
+        # for i in range(dim):
+        #     if random.random() < xover_rate:
+        #         child1.gene[i] = parent2.gene[i]
+        #         child2.gene[i] = parent1.gene[i]
+        #     else:
+        #         child1.gene[i] = parent1.gene[i]
+        #         child2.gene[i] = parent2.gene[i]
 
-        return child1, child2
-
-    @classmethod
-    def cxonepoint(cls, parent1, parent2) -> tuple:
         # one point crossover
-        dim = len(parent1.gene)
-        child1, child2 = Chromosome(dim), Chromosome(dim)
+        # cxpoint = random.randint(1, dim - 1)
+        # child1.gene[cxpoint:], child2.gene[cxpoint:] = child2.gene[cxpoint:], child1.gene[cxpoint:]
 
-        cxpoint = random.randint(1, dim - 1)
-        child1.gene[cxpoint:], child2.gene[cxpoint:] = child2.gene[cxpoint:], child1.gene[cxpoint:]
-
-        return child1, child2
-
-    @classmethod
-    def cxnpoint(cls, parent1, parent2) -> tuple:
-        # n-point crossover
-        dim = len(parent1.gene)
-        child1, child2 = Chromosome(dim), Chromosome(dim)
-
-        cxpoint1 = random.randint(1, dim)
-        cxpoint2 = random.randint(1, dim - 1)
-
-        if cxpoint2 > cxpoint1:
-            cxpoint2 += 1
-        else:
-            cxpoint1, cxpoint2 = cxpoint1, cxpoint2
-
-        child1.gene[cxpoint1:cxpoint2], child2.gene[cxpoint1:cxpoint2] = child2.gene[cxpoint1:cxpoint2], child1.gene[
-                                                                                                         cxpoint1:cxpoint2]
-
-        return child1, child2
-
-    @classmethod
-    def cxblend(cls, parent1, parent2, alpha) -> tuple:
         # blend crossover
-        dim = len(parent1.gene)
-        child1, child2 = Chromosome(dim), Chromosome(dim)
-
+        alpha = 1.5
         for i, (x1, x2) in enumerate(zip(child1.gene, child2.gene)):
             gamma = (1. + 2. * alpha) * random.random() - alpha
             child1.gene[i] = (1. - gamma) * x1 + gamma * x2
             child2.gene[i] = gamma * x1 + (1. - gamma) * x2
-
-        return child1, child2
-
-    @classmethod
-    def cxWAri(cls, parent1, parent2, alpha) -> tuple:
-        # Whole Arithmetic Crossover
-        # print("parent1: ", parent1)
-        dim = len(parent1.gene)
-        child1, child2 = Chromosome(dim), Chromosome(dim)
-
-        for i, (x1, x2) in enumerate(zip(child1.gene, child2.gene)):
-            child1.gene[i] = alpha * x1 + (1 - alpha) * x2
-            child2.gene[i] = alpha * x1 + (1 - alpha) * x2
 
         return child1, child2
 
@@ -176,33 +126,6 @@ class Chromosome:
             if random.random() < mutate_rate:
                 chrm.gene[i] = random.uniform(ACTION_LB, ACTION_UB)
 
-        return
-
-    @classmethod
-    def muFlipBit(cls, chrm, mutate_rate) -> None:
-        # Flip Bit mutation
-        dim = len(chrm.gene)
-        for i in range(dim):
-            if random.random() < mutate_rate:
-                chrm.gene[i] = type(chrm.gene[i])(not chrm.gene[i])
-        return
-
-    @classmethod
-    def muGaussian(cls, chrm, mu, sigma, mutate_rate) -> None:
-        # Gaussian mutation
-        dim = len(chrm.gene)
-        if not isinstance(mu, Sequence):
-            mu = repeat(mu, dim)
-        elif len(mu) < dim:
-            raise IndexError("mu must be at least the size of individual: %d < %d" % (len(mu), dim))
-        if not isinstance(sigma, Sequence):
-            sigma = repeat(sigma, dim)
-        elif len(sigma) < dim:
-            raise IndexError("sigma must be at least the size of individual: %d < %d" % (len(sigma), dim))
-
-        for i, m, s in zip(range(dim), mu, sigma):
-            if random.random() < mutate_rate:
-                chrm.gene[i] += random.gauss(m, s)
         return
 
 
@@ -242,32 +165,15 @@ class GA:
         #### Reproduction ####
         while len(offspring) < self.pop_size:
             #### Parent selection ####
-            # p1 = self.parent_selection(k=GA_K_TOURNAMENT)
-            # p2 = self.parent_selection(k=GA_K_TOURNAMENT)
-            p1, p2 = self.parent_selection(k=GA_K_TOURNAMENT)
-            print("parent1\t: ", p1, "\nparent2\t: ", p2)
-            #### Roulette Wheel selection ####
-            # p1 = self.selRouletteWheel(k=GA_K_TOURNAMENT)
-            # p2 = self.selRouletteWheel(k=GA_K_TOURNAMENT)
-            # #### Tournment ####
-            # p1 = self.selTournment(k=GA_K_TOURNAMENT)
-            # p2 = self.selTournment(k=GA_K_TOURNAMENT)
+            p1 = self.parent_selection(k=GA_K_TOURNAMENT)
+            p2 = self.parent_selection(k=GA_K_TOURNAMENT)
 
             #### Crossover ####
             c1, c2 = Chromosome.crossover(p1, p2, self.xover_rate)
-            # c1, c2 = Chromosome.cxnpoint(p1, p2)  # n-point crossover
-            # c1, c2 = Chromosome.cxblend(p1, p2, GA_BLEND_CROSSOVER_ALPHA)  # blend crossover
-            # c1, c2 = Chromosome.cxWAri(p1, p2, self.xover_rate)  # Whole Arithmetic crossover
 
             #### Mutation ####
-            # Chromosome.mutate(c1, self.mutate_rate)
-            # Chromosome.mutate(c2, self.mutate_rate)
-            #### Flip Bit ####
-            # Chromosome.muFlipBit(c1, self.mutate_rate)
-            # Chromosome.muFlipBit(c2, self.mutate_rate)
-            #### Gaussian ####
-            Chromosome.muGaussian(c1, 0, 3, self.mutate_rate)
-            Chromosome.muGaussian(c2, 0, 3, self.mutate_rate)
+            Chromosome.mutate(c1, self.mutate_rate)
+            Chromosome.mutate(c2, self.mutate_rate)
 
             offspring += [c1, c2]
 
@@ -290,7 +196,7 @@ class GA:
         self.survival_selection(pool=intermediate_pop, n_survivor=self.pop_size)
 
         ## (mu, lambda) ##
-        # self.survivors(pool=offspring, n_survivor=self.pop_size)
+        # self.survivors(pool=offspring, n_survivor=self.pop_size)   
 
     def parent_selection(self, k) -> Chromosome:
         """
@@ -298,35 +204,7 @@ class GA:
         The following code implements the random parent selection.
         Please implement your parent selection strategy and replace the following code with yours.
         """
-        # return self.pop[random.randint(0, (self.pop_size-1))]
-
-        #         chrm_list = []
-        #         weights   = []
-        #         for chrm_i in self.pop:
-        #             chrm_i_fitness = evaluate(chrm_i.gene)
-        #             weight         = abs(1/chrm_i_fitness)
-        #             chrm_list.append(chrm_i)
-        #             weights.append(weight)
-
-        #         parent = random.choices(chrm_list, weights = weights)[0]
-        #         return parent
-        chosen = random.sample(self.pop, k)
-        chrm_fits = [(c, evaluate(c.gene)) for c in chosen]
-        parents = sorted(chrm_fits, key=itemgetter(1), reverse=True)
-        return parents[0][0], parents[1][0]
-
-    def selRouletteWheel(self, k) -> Chromosome:
-        max = sum([abs(1 / evaluate(c.gene)) for c in self.pop])
-        pick = random.uniform(0, max)
-        current = 0
-        for chromosome in self.pop:
-            current += abs(1 / evaluate(chromosome.gene))
-            print("current\t:", current)
-            if current > pick:
-                print("max\t:", max)
-                print("pick\t:", pick)
-                print(chromosome)
-                return chromosome
+        return self.pop[random.randint(0, (self.pop_size - 1))]
 
     def survival_selection(self, pool, n_survivor) -> list:
         """
@@ -343,7 +221,7 @@ class GA:
 
 
 #### [DON'T CHANGE] Please don't change any part of this function. ####
-def evaluate(gene: list, repeat=SIMULATIONS_PER_EVALUATION, mode="mean", display=False) -> float:
+def evaluate(gene: list, repeat=SIMULATIONS_PER_EVALUATION, mode="mean", display=True) -> float:
     rewards = []
 
     for i in range(repeat):
@@ -352,7 +230,7 @@ def evaluate(gene: list, repeat=SIMULATIONS_PER_EVALUATION, mode="mean", display
         epsiodic_reward = 0.0
         if display:
             while True:
-                # env.render()
+                #env.render()
                 obsv, reward, done, _ = env.step(action)
                 epsiodic_reward += reward
                 action = get_action(obsv, gene)
@@ -389,10 +267,10 @@ def get_action(observation: list, gene: list) -> list:
     obsv_dim = 6
     obsv_grid = [
         [0.5, 0.0, -0.5],  # x position
-        [0.7, 0.1, -0.5],  # x volecity
-        [0.5, 0.0, -0.5],  # y position
+        [0.7, 0.1, -0.5],  # y position
+        [0.5, 0.0, -0.5],  # x volecity
         [0.0, -0.5, -1.0],  # y volecity
-        [1.0, 0.0, -1.0],  # angle
+        [1.0, 0.0, -1.0],  # tilt angle
         [2.0, 0.0, -2.0],  # angular volecity
     ]
 
@@ -433,24 +311,14 @@ ga = GA(
 print(f"Generation {0: 4d}, best fitness = {ga.best_so_far.fitness:4.2f}")
 evaluate(ga.best_so_far.gene, display=True)
 
-best_fitness = []
 #### Evolve until termination criterion is met. #####
 for i in range(GA_GENERATION):
     ga.evolve()
     print(f"Generation {(i + 1): 4d}, best fitness = {ga.best_so_far.fitness:4.2f}")
     evaluate(ga.best_so_far.gene, display=True)
-    best_fitness.append(ga.best_so_far.fitness)
-
-plt.plot(best_fitness, linewidth=2.0, color='r')
-plt.xlabel('Generations')
-plt.ylabel('Fitness')
-plt.title('Anytime behivor')
-plt.savefig('Anytime_behivor.png')
-print(best_fitness)
 
 #### Store the best solution ####
 with open('best_gene.pickle', 'wb') as f:
     pickle.dump(ga.best_so_far.gene, f)
-
 # LunarLander_HW.py
 # 目前顯示的是「LunarLander_HW.py」。
