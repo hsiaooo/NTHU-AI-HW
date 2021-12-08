@@ -248,8 +248,8 @@ class GA:
             # print("parent1\t: ", p1, "\nparent2\t: ", p2)
 
             #### Crossover ####
-            c1, c2 = Chromosome.crossover(p1, p2, self.xover_rate)  #Uniform crossover
-            # c1, c2 = Chromosome.onepoint(p1, p2)  # one-point crossover
+            # c1, c2 = Chromosome.crossover(p1, p2, self.xover_rate)  #Uniform crossover
+            c1, c2 = Chromosome.onepoint(p1, p2)  # one-point crossover
             # c1, c2 = Chromosome.twopoint(p1, p2)  # two-point crossover
             # c1, c2 = Chromosome.blend(p1, p2, GA_BLEND_CROSSOVER_ALPHA)  # blend crossover
             # c1, c2 = Chromosome.WAri(p1, p2, self.xover_rate)  # Whole Arithmetic crossover
@@ -422,18 +422,13 @@ print(f"Generation {0: 4d}, best fitness = {ga.best_so_far.fitness:4.2f}")
 evaluate(ga.best_so_far.gene, display=True)
 
 best_fitness = []
-result       = [[0 for _ in range(2)] for _ in range(GA_GENERATION)]
 #### Evolve until termination criterion is met. #####
 for i in range(GA_GENERATION):
     ga.evolve()
     print(f"Generation {(i + 1): 4d}, best fitness = {ga.best_so_far.fitness:4.2f}")
     evaluate(ga.best_so_far.gene, display=True)
     best_fitness.append(ga.best_so_far.fitness)
-    result[i][0] = i
-    result[i][1] = ga.best_so_far.fitness
-    np.save('Array', result)
-    # print(result)
-    
+        
 #### plot anytime behavior ####
 plt.plot(best_fitness, linewidth=2.0, color='r')
 plt.xlabel('Generations')
